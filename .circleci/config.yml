@@ -15,6 +15,14 @@ jobs:
     steps:
       - run:
           command: echo world
+  print_project-author:
+    docker:
+      - image: alpine:latest
+    steps:
+      - run:
+          name: "echo an env var with the name of the project author"
+          command: |
+            echo $PROJECT_AUTHOR
 
 
 workflows:
@@ -25,3 +33,5 @@ workflows:
       - print_hello
       - print_world:
           requires: [print_hello]
+      - print_project-author:
+          requires: [print_world]
