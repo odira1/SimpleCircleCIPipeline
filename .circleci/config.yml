@@ -2,27 +2,58 @@
 version: 2.1
 # Orchestrate or schedule a set of jobs
 jobs:
-  print_hello:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - run:
-          command: echo hello
-          name: echo Hello
-  print_world:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - run:
-          command: echo world
-  print_project-author:
+  # print_hello:
+  #   docker:
+  #     - image: circleci/node:13.8.0
+  #   steps:
+  #     - run:
+  #         command: echo hello
+  #         name: echo Hello
+  # print_world:
+  #   docker:
+  #     - image: circleci/node:13.8.0
+  #   steps:
+  #     - run:
+  #         command: echo world
+  # print_project-author:
+  #   docker:
+  #     - image: alpine:latest
+  #   steps:
+  #     - run:
+  #         name: "echo an env var with the name of the project author"
+  #         command: |
+  #           echo $PROJECT_AUTHOR
+  save_hello_world_output:
     docker:
       - image: alpine:latest
     steps:
       - run:
-          name: "echo an env var with the name of the project author"
+          name: "echo an hello world message to a file"
           command: |
-            echo $PROJECT_AUTHOR
+            echo "Hello World" > ~/output.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - output.txt
+      - run:
+          name: "get the current directory. "
+          command: |
+            pwd && ls -al
+  print_output_file:
+    docker:
+      - image: alpine:latest
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: "get the current directory."
+          command: |
+            pwd && ls -al
+      - run:
+          name: "echo content of text file to console"
+          command: |
+            cat ~/output.txt
+
 
 
 workflows:
@@ -30,8 +61,14 @@ workflows:
   welcome:
     # Run the welcome/run job in its own container
     jobs:
-      - print_hello
-      - print_world:
-          requires: [print_hello]
-      - print_project-author:
-          requires: [print_world]
+      # - print_hello
+      # - print_world:
+      #     requires: [print_hello]
+      # - print_project-author:
+      #     requires: [print_world]
+      - save_hello_world_output
+          # requires:
+          #   - print_project-author
+      - print_output_file:
+          requires:
+            - save_hello_world_output
