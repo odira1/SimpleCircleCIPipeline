@@ -10,7 +10,7 @@ commands:
     parameters:
       pipeline_id:
         type: string
-        default: $CIRCLE_WORKFLOW_ID
+        # default: ${CIRCLE_WORKFLOW_ID}
     steps:
       - run: echo << parameters.pipeline_id >>
 
@@ -69,7 +69,19 @@ jobs:
   print_pipeline_idx:
     << : *defaults
     steps:
-      - print_pipeline_id
+      - print_pipeline_id:
+          pipeline_id: <<pipeline.id>>
+  job_with_failure:
+    docker:
+      - image: circleci/node:13:0
+    steps:
+      - run:
+          name: a step that fails
+          command: return 1 # force a failure by return a non zero code
+      - run:
+          name: a step occurs when something fails.
+          command: echo "Hello Error!"
+          when: on_fail
 
 
 
@@ -93,3 +105,6 @@ workflows:
       - print_pipeline_idx:
           requires:
             - print_output_file
+      - job_with_failure:
+          requires:
+            - print_pipeline_idx
