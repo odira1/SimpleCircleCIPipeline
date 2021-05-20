@@ -75,9 +75,7 @@ jobs:
     docker:
       - image: circleci/node:13.8.0
     steps:
-      - run:
-          name: a step that fails
-          command: return 1 # force a failure by return a non zero code
+      - run: return 1 # force a failure by return a non zero code
       - run:
           name: a step occurs when something fails.
           command: echo "Hello Error!"
