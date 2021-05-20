@@ -73,7 +73,7 @@ jobs:
           pipeline_id: <<pipeline.id>>
   job_with_failure:
     docker:
-      - image: circleci/node:13:0
+      - image: circleci/node:13:8.0
     steps:
       - run:
           name: a step that fails
